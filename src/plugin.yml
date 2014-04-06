@@ -5,5 +5,5 @@ author: Empire92
 website: www.empcraft.com
 depend: [Vault,ProtocolLib]
 commands:
-   isp:
+   im:
       description: InSignsPlus commands.

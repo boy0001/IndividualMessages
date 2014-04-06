@@ -365,19 +365,6 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
 			return "";
 		}
 	}
-
-	public boolean iswhitelisted(String lines) {
-		List<String> mylist= getConfig().getStringList("signs.autoupdate.whitelist");
-		for(String current:mylist){
-			if(lines.contains("{"+current+"}")) {
-				return true;
-			}
-			else if(lines.contains("{"+current+":")) {
-				return true;
-			}
-		}
-		return false;
-	}
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
@@ -440,7 +427,7 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-    	if (cmd.getName().equalsIgnoreCase("isp")) {
+    	if ((cmd.getName().equalsIgnoreCase("im"))||(cmd.getName().equalsIgnoreCase("inme"))) {
     		boolean failed = true;
     		Player player;
     		if (sender instanceof Player==false) {
@@ -451,7 +438,7 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
     		}
     		if (args.length > 0) {
     			if ((args[0].equalsIgnoreCase("list"))){
-    				msg (player,"&6Placeholders for '&cInSignsPlus&6'&7:");
+    				msg (player,"&6Placeholders for '&cIndividual Messages&6'&7:");
     				for (Placeholder current:getAllPlaceholders()) {
     					if (placeholders.get(current.getKey())!=null) {
     						msg(player,"&7 - &a{"+current+"}");
@@ -463,18 +450,18 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
     				return true;
     			}
     			if ((args[0].equalsIgnoreCase("enable"))){
-    				if (checkperm(player,"insignsplus.enable")) {
+    				if (checkperm(player,"inme.enable")) {
     					if (args.length>1) {
     						boolean placeholder = addPlaceholder(args[1]);
     						if (placeholder==false) {
-    							msg(player,"Invalid placeholder: /isp list");
+    							msg(player,"Invalid placeholder: /inme list");
     							return false;
     						}
     						msg(player,"&7Enabled placeholder &c"+args[1]);
     						return true;
     					}
     					else {
-    						msg(player,"/isp enablfe <key>");
+    						msg(player,"/inme enablfe <key>");
     					}
     				}
     				else {
@@ -483,39 +470,39 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
     				return false;
     			}
     			if ((args[0].equalsIgnoreCase("disable"))){
-    				if (checkperm(player,"insignsplus.disable")) {
+    				if (checkperm(player,"inme.disable")) {
     					if (args.length>1) {
     						Placeholder placeholder = removePlaceholder(args[1]);
     						if (placeholder==null) {
-    							msg(player,"Invalid placeholder: /isp list");
+    							msg(player,"Invalid placeholder: /inme list");
     							return false;
     						}
     						msg(player,"&7Disabled placeholder &c"+args[1]);
     						return true;
     					}
     					else {
-    						msg(player,"/isp disable <key>");
+    						msg(player,"/inme disable <key>");
     					}
     				}
     				else {
-    					msg(player,"&7You lack the permission &cinsignsplus.disable");
+    					msg(player,"&7You lack the permission &inme.disable");
     				}
     				return false;
     			}
     			if ((args[0].equalsIgnoreCase("reload"))){
     				failed = false;
-    				if (checkperm(player,"insignsplus.reload")) {
+    				if (checkperm(player,"inme.reload")) {
     					reloadConfig();
-    					getConfig().getConfigurationSection("signs").set("placeholders", null);
+    					getConfig().getConfigurationSection("scripting").set("placeholders", null);
     			        File f1 = new File(getDataFolder() + File.separator + "scripts");
-    			        File[] mysigns = f1.listFiles();
-    			        for (int i = 0; i < mysigns.length; i++) {
-    			        	if (mysigns[i].isFile()) {
-    			        		if (mysigns[i].getName().contains(".yml")) {
-    				        		FileConfiguration current = YamlConfiguration.loadConfiguration(mysigns[i]);
+    			        File[] myph = f1.listFiles();
+    			        for (int i = 0; i < myph.length; i++) {
+    			        	if (myph[i].isFile()) {
+    			        		if (myph[i].getName().contains(".yml")) {
+    				        		FileConfiguration current = YamlConfiguration.loadConfiguration(myph[i]);
     				        		Set<String> values = current.getConfigurationSection("").getKeys(false);
     								for(String myval:values) {
-    				        			getConfig().set("scripting.placeholders."+mysigns[i].getName().substring(0,mysigns[i].getName().length()-4), current.get(myval));
+    				        			getConfig().set("scripting.placeholders."+myph[i].getName().substring(0,myph[i].getName().length()-4), current.get(myval));
     				        		}
     			        		}
     			        	}
@@ -533,15 +520,15 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
     	    			msg(player,"&aRELOADED!");
     				}
     				else {
-    					msg(player,"&7You lack the permission &cinsignsplus.reload&7!");
+    					msg(player,"&7You lack the permission &inme.reload&7!");
     				}
     				
     			}
     			else if ((args[0].equalsIgnoreCase("save"))){
     				failed = false;
-    				if (checkperm(player,"insignsplus.save")) {
+    				if (checkperm(player,"inme.save")) {
     					getConfig().getConfigurationSection("scripting").set("variables", null);
-        				msg(null,"[InSignsPlus] Saving variables...");
+        				msg(null,"[IndividualMessages] Saving variables...");
         		        for (final Entry<String, Object> node : globals.entrySet()) {
         		        	getConfig().options().copyDefaults(true);
         		        	getConfig().set("scripting.variables."+(""+node.getKey()).substring(1,(""+node.getKey()).length()-1), (""+node.getValue()));
@@ -554,13 +541,13 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
     	    			msg(player,"&aSAVED!");
     				}
     				else {
-    					msg(player,"&7You lack the permission &cinsignsplus.save&7!");
+    					msg(player,"&7You lack the permission &inme.save&7!");
     				}
     				
     			}
     		}
     		if (failed) {
-    			msg(player,"&7Commands:\n&7 - &a/isp reload\n&7 - &a/isp save");
+    			msg(player,"&7Commands:\n&7 - &a/inme reload\n&7 - &a/inme save");
     		}
     	}
     	return true;
@@ -723,7 +710,7 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
     	return toreturn;
     }
 	public void onDisable() {
-			getConfig().getConfigurationSection("signs").set("placeholders", null);
+			getConfig().getConfigurationSection("scripting").set("placeholders", null);
 	    	reloadConfig();
 	    	saveConfig();
 			msg(null,"f&oSAVING VARIABLES!");
@@ -733,7 +720,7 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
 	        	getConfig().set("scripting.variables."+(""+node.getKey()).substring(1,(""+node.getKey()).length()-1), (""+node.getValue()));
 	        	saveConfig();
 	        }
-	        msg(null,"&f&oThanks for using &aInSignsPlus&f by Empire92!");
+	        msg(null,"&f&oThanks for using &aIndividualMessages&f by Empire92!");
 			}
 			catch (Exception e) {
 				
@@ -1041,59 +1028,51 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
     public synchronized Placeholder getPlaceholder (String key) {
     	return placeholders.get(key);
     }
-    
-    
-    
-    private void translateAll(Object input)
+    private void evaluateAll(Object input)
     {
-      if ((input instanceof JSONObject))
-      {
-        JSONObject o = (JSONObject)input;
-        for (Object k : o.keySet())
-        {
-          Object v = o.get(k);
-          if ((v instanceof JSONObject))
-          {
-            translateAll((JSONObject)v);
-          }
-          else if ((v instanceof JSONArray))
-          {
-            translateAll((JSONArray)v);
-          }
-          else if ((v instanceof String))
-          {
-            String s = v.toString();
-            o.put(k, evaluate(s, false, null));
-          }
-        }
-      }
-      else if ((input instanceof JSONArray))
-      {
-        JSONArray a = (JSONArray)input;
-        for (int i = 0; i < a.size(); i++)
-        {
-          Object v = a.get(i);
-          if ((v instanceof JSONObject))
-          {
-            translateAll((JSONObject)v);
-          }
-          else if ((v instanceof JSONArray))
-          {
-            translateAll((JSONArray)v);
-          }
-          else if ((v instanceof String))
-          {
-            String s = v.toString();
-            a.set(i, evaluate(s, false, null));
-          }
-        }
-      }
+    	if ((input instanceof JSONObject))
+    	{
+    		JSONObject object = (JSONObject)input;
+    		for (Object k : object.keySet())
+    		{
+    			Object value = object.get(k);
+    			if ((value instanceof JSONObject))
+    			{
+    				evaluateAll((JSONObject)value);
+    			}
+    			else if ((value instanceof JSONArray))
+    			{
+    				evaluateAll((JSONArray)value);
+    			}
+    			else if ((value instanceof String))
+    			{
+    				String string = value.toString();
+    				object.put(k, colorise(evaluate(string, false, null)));
+    			}
+    		}
+    	}
+    	else if ((input instanceof JSONArray))
+    	{
+    		JSONArray array = (JSONArray)input;
+    		for (int i = 0; i < array.size(); i++)
+    		{
+    			Object value = array.get(i);
+    			if ((value instanceof JSONObject))
+    			{
+    				evaluateAll((JSONObject)value);
+    			}
+    			else if ((value instanceof JSONArray))
+    			{
+    				evaluateAll((JSONArray)value);
+    			}
+    			else if ((value instanceof String))
+    			{
+    				String string = value.toString();
+    				array.set(i, colorise(evaluate(string, false, null)));
+    			}
+    		}
+    	}
     }
-    
-    
-    
-    
-    
 	@Override
 	public void onEnable(){
 		protocolmanager = ProtocolLibrary.getProtocolManager();
@@ -1104,14 +1083,6 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
             return;
         }
         saveResource("english.yml", true);
-        Plugin insignsPlugin = Bukkit.getServer().getPluginManager().getPlugin("InSigns");
-        if((insignsPlugin != null)) {
-        	if (insignsPlugin.isEnabled()) {
-	            msg(null,"&c[Info] Plugin 'InSigns' is no longer required..");
-        	}
-        } else {
-            
-        }
         File f8 = new File(getDataFolder() + File.separator+"scripts"+File.separator+"example.yml");
         if(f8.exists()!=true) {  saveResource("scripts"+File.separator+"example.yml", false); }
         File f9 = new File(getDataFolder() + File.separator+"scripts"+File.separator+"test.js");
@@ -1142,7 +1113,7 @@ public final class IndividualMessages extends JavaPlugin implements Listener {
                     JSONParser parser = new JSONParser();
                     try {
                         JSONObject json = (JSONObject)parser.parse(((WrappedChatComponent)chat.read(0)).getJson());
-                        translateAll(json);
+                        evaluateAll(json);
                         chat.write(0, WrappedChatComponent.fromJson(json.toJSONString()));
                     } 
                     catch (ParseException e) {
